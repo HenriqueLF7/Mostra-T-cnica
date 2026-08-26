@@ -3,6 +3,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -43,7 +44,7 @@ public class Main {
         if (!Files.exists(arquivo)) {
 
             String resposta = "Arquivo não encontrado.";
-            byte[] dadosResposta = resposta.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            byte[] dadosResposta = resposta.getBytes(StandardCharsets.UTF_8);
 
             exchange.sendResponseHeaders(
                     404,
@@ -61,17 +62,26 @@ public class Main {
         byte[] dados = Files.readAllBytes(arquivo);
 
         String tipo = "text/plain";
+        String caminhoLower = arquivo.toString().toLowerCase();
 
-        if (arquivo.toString().endsWith(".html")) {
+        if (caminhoLower.endsWith(".html")) {
             tipo = "text/html";
         }
 
-        if (arquivo.toString().endsWith(".css")) {
+        if (caminhoLower.endsWith(".css")) {
             tipo = "text/css";
         }
 
-        if (arquivo.toString().endsWith(".js")) {
+        if (caminhoLower.endsWith(".js")) {
             tipo = "application/javascript";
+        }
+
+        if (caminhoLower.endsWith(".png")) {
+            tipo = "image/png";
+        }
+
+        if (caminhoLower.endsWith(".jpg") || caminhoLower.endsWith(".jpeg")) {
+            tipo = "image/jpeg";
         }
 
         exchange.getResponseHeaders()
@@ -94,8 +104,9 @@ public class Main {
         if (exchange.getRequestMethod().equals("POST")) {
 
             String comando = new String(
-                    exchange.getRequestBody().readAllBytes()
-            );
+                    exchange.getRequestBody().readAllBytes(),
+                    StandardCharsets.UTF_8
+            ).trim().toUpperCase();
 
             moverJogador(comando);
         }
@@ -104,7 +115,7 @@ public class Main {
         "{ \"x\": " + playerX +
         ", \"y\": " + playerY + " }";
 
-        byte[] dados = resposta.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        byte[] dados = resposta.getBytes(StandardCharsets.UTF_8);
 
         exchange.getResponseHeaders()
                 .set("Content-Type", "application/json");
@@ -122,7 +133,7 @@ public class Main {
 
     private static void moverJogador(String comando) {
 
-        int velocidade = 5;
+        int velocidade = 10;
 
         switch (comando) {
 
@@ -143,10 +154,10 @@ public class Main {
                 break;
         }
 
-       
+        
         //tamanho da tela que da pra mecher esse trem vermelho
-        int larguraMax = 1900;
-        int alturaMax = 1060;
+        int larguraMax = 1900 - 50;
+        int alturaMax = 1060 - 70;
 
         if (playerX < 0) {
             playerX = 0;

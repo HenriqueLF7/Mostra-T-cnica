@@ -45,10 +45,15 @@ function enviarComando(comando) {
 
     .then(data => {
 
-        playerX = data.x;
-        playerY = data.y;
+        if (data && typeof data.x === "number" && typeof data.y === "number") {
+            const larguraMax = window.innerWidth - 50;
+            const alturaMax = window.innerHeight - 70;
 
-        atualizarTela();
+            playerX = Math.max(0, Math.min(data.x, larguraMax));
+            playerY = Math.max(0, Math.min(data.y, alturaMax));
+
+            atualizarTela();
+        }
 
     })
 
@@ -63,10 +68,17 @@ function atualizarTela() {
 
 setInterval(function() {
 
-    if (teclas.w) enviarComando("W");
-    if (teclas.a) enviarComando("A");
-    if (teclas.s) enviarComando("S");
-    if (teclas.d) enviarComando("D");
+    if (teclas.w) {
+        enviarComando("W");
+    } else if (teclas.s) {
+        enviarComando("S");
+    }
+
+    if (teclas.a) {
+        enviarComando("A");
+    } else if (teclas.d) {
+        enviarComando("D");
+    }
 
 }, 50);
 
