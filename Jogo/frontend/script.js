@@ -82,4 +82,82 @@ setInterval(function() {
 
 }, 50);
 
+// =============================
+// CRONÔMETRO
+// =============================
+
+// 3 minutos = 180 segundos
+
+let tempo = 180;
+
+
+const intervaloCronometro = setInterval(function() {
+
+    // Diminui 1 segundo
+
+    tempo--;
+
+
+    // Calcula minutos
+
+    const minutos = Math.floor(tempo / 60);
+
+
+    // Calcula segundos
+
+    const segundos = tempo % 60;
+
+
+    // Formata para 00:00
+
+    const minutosFormatados = String(minutos).padStart(2, "0");
+
+    const segundosFormatados = String(segundos).padStart(2, "0");
+
+
+    // Mostra na tela
+
+    cronometro.textContent =
+        minutosFormatados + ":" + segundosFormatados;
+
+
+    // Quando faltar 1 minuto
+
+    if (tempo <= 60) {
+
+        cronometro.style.color = "yellow";
+
+    }
+
+
+    // Quando faltar 30 segundos
+
+    if (tempo <= 30) {
+
+        cronometro.style.color = "red";
+
+    }
+
+
+    // Quando chegar em zero
+
+    if (tempo <= 0) {
+
+        clearInterval(intervaloCronometro);
+
+        cronometro.textContent = "00:00";
+
+        cronometro.style.color = "red";
+
+        console.log("TEMPO ESGOTADO!");
+
+    }
+
+}, 1000);
+
+
+// =============================
+// POSIÇÃO INICIAL
+// =============================
+
 atualizarTela();
