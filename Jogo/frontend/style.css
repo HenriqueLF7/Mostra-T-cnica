@@ -31,3 +31,69 @@ body {
     left: 100px;
     top: 100px;
 }
+
+Perfeito. Esse é o seu CSS atual. Para adicionar o cronômetro sem mexer no funcionamento do jogador ou do fundo, basta acrescentar o bloco #cronometro.
+
+Seu style.css completo fica assim:
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+}
+
+#game {
+    width: 100vw;
+    height: 100vh;
+
+    background-image: url('/Imagens/fundo.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    position: relative;
+}
+
+#player {
+    width: 50px;
+    height: 70px;
+
+    background: rgb(0, 34, 255);
+
+    position: absolute;
+
+    left: 100px;
+    top: 100px;
+}
+
+
+/* ========================= */
+/* CRONÔMETRO */
+/* ========================= */
+
+#cronometro {
+    position: fixed;
+
+    top: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    padding: 10px 25px;
+
+    border-radius: 10px;
+
+    z-index: 1000;
+}
