@@ -3,6 +3,11 @@ const player = document.getElementById("player");
 let playerX = 100;
 let playerY = 100;
 
+const zumbi = document.getElementById("zumbi");
+
+let zumbiX = 500;
+let zumbiY = 300;
+
 const teclas = {
     w: false,
     a: false,
@@ -64,7 +69,35 @@ function atualizarTela() {
     player.style.left = playerX + "px";
     player.style.top = playerY + "px";
 
+    zumbi.style.left = zumbiX + "px";
+    zumbi.style.top = zumbiY + "px";
 }
+
+setInterval(function() {
+
+    fetch("/player")
+        .then(response => response.json())
+        .then(data => {
+
+            if (data && typeof data.x === "number" && typeof data.y === "number") {
+
+                playerX = data.x;
+                playerY = data.y;
+
+            }
+
+            if (data && typeof data.zumbiX === "number" && typeof data.zumbiY === "number") {
+
+                zumbiX = data.zumbiX;
+                zumbiY = data.zumbiY;
+
+            }
+
+            atualizarTela();
+
+        });
+
+}, 50);
 
 setInterval(function() {
 

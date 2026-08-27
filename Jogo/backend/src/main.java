@@ -12,9 +12,13 @@ public class Main {
     private static int playerX = 100;
     private static int playerY = 100;
 
+    private static Zombie zumbi = new Zombie(500, 300);
+
     public static void main(String[] args) throws Exception {
 
-        HttpServer server = HttpServer.create(
+    Database.criarTabelas();
+
+    HttpServer server = HttpServer.create(
                 new InetSocketAddress(8080),
                 0
         );
@@ -24,6 +28,23 @@ public class Main {
         server.createContext("/player", Main::player);
 
         server.start();
+        
+        Thread jogo = new Thread(() -> {
+
+    while (true) {
+
+        zumbi.moverEmDirecao(playerX, playerY);
+
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            break;
+        }
+    }
+
+});
+
+jogo.start();
 
         System.out.println("ta funcion ando porra");
         System.out.println("http://localhost:8080");
@@ -113,7 +134,10 @@ public class Main {
 
         String resposta =
         "{ \"x\": " + playerX +
-        ", \"y\": " + playerY + " }";
+        ", \"y\": " + playerY +
+        ", \"zumbiX\": " + zumbi.x +
+        ", \"zumbiY\": " + zumbi.y +
+        " }";
 
         byte[] dados = resposta.getBytes(StandardCharsets.UTF_8);
 
