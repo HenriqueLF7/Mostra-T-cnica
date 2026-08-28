@@ -9,185 +9,208 @@ let zumbiX = 500;
 let zumbiY = 300;
 
 const teclas = {
-    w: false,
-    a: false,
-    s: false,
-    d: false
+  w: false,
+  a: false,
+  s: false,
+  d: false,
 };
 
-document.addEventListener("keydown", function(event) {
+const telaFim = document.getElementById("telaFim");
+const btnRecomecar = document.getElementById("btnRecomecar");
 
-    const tecla = event.key.toLowerCase();
+document.addEventListener("keydown", function (event) {
+  const tecla = event.key.toLowerCase();
 
-    if (tecla === "w") teclas.w = true;
-    if (tecla === "a") teclas.a = true;
-    if (tecla === "s") teclas.s = true;
-    if (tecla === "d") teclas.d = true;
-
+  if (tecla === "w") teclas.w = true;
+  if (tecla === "a") teclas.a = true;
+  if (tecla === "s") teclas.s = true;
+  if (tecla === "d") teclas.d = true;
 });
 
-document.addEventListener("keyup", function(event) {
+document.addEventListener("keyup", function (event) {
+  const tecla = event.key.toLowerCase();
 
-    const tecla = event.key.toLowerCase();
-
-    if (tecla === "w") teclas.w = false;
-    if (tecla === "a") teclas.a = false;
-    if (tecla === "s") teclas.s = false;
-    if (tecla === "d") teclas.d = false;
-
+  if (tecla === "w") teclas.w = false;
+  if (tecla === "a") teclas.a = false;
+  if (tecla === "s") teclas.s = false;
+  if (tecla === "d") teclas.d = false;
 });
 
 function enviarComando(comando) {
+  fetch("/player", {
+    method: "POST",
+    body: comando,
+  })
+    .then((response) => response.json())
 
-    fetch("/player", {
+    .then((data) => {
+      if (data && typeof data.x === "number" && typeof data.y === "number") {
+        const larguraMax = window.innerWidth - 50;
+        const alturaMax = window.innerHeight - 70;
 
-        method: "POST",
-        body: comando
+        playerX = Math.max(0, Math.min(data.x, larguraMax));
+        playerY = Math.max(0, Math.min(data.y, alturaMax));
 
-    })
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        if (data && typeof data.x === "number" && typeof data.y === "number") {
-            const larguraMax = window.innerWidth - 50;
-            const alturaMax = window.innerHeight - 70;
-
-            playerX = Math.max(0, Math.min(data.x, larguraMax));
-            playerY = Math.max(0, Math.min(data.y, alturaMax));
-
-            atualizarTela();
-        }
-
-    })
-
+        atualizarTela();
+      }
+    });
 }
 
 function atualizarTela() {
+  player.style.left = playerX + "px";
+  player.style.top = playerY + "px";
 
-    player.style.left = playerX + "px";
-    player.style.top = playerY + "px";
-
-    zumbi.style.left = zumbiX + "px";
-    zumbi.style.top = zumbiY + "px";
+  zumbi.style.left = zumbiX + "px";
+  zumbi.style.top = zumbiY + "px";
 }
 
-setInterval(function() {
+setInterval(function () {
+  fetch("/player")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data && typeof data.x === "number" && typeof data.y === "number") {
+        playerX = data.x;
+        playerY = data.y;
+      }
 
-    fetch("/player")
-        .then(response => response.json())
-        .then(data => {
+      if (
+        data &&
+        typeof data.zumbiX === "number" &&
+        typeof data.zumbiY === "number"
+      ) {
+        zumbiX = data.zumbiX;
+        zumbiY = data.zumbiY;
+      }
 
-            if (data && typeof data.x === "number" && typeof data.y === "number") {
-
-                playerX = data.x;
-                playerY = data.y;
-
-            }
-
-            if (data && typeof data.zumbiX === "number" && typeof data.zumbiY === "number") {
-
-                zumbiX = data.zumbiX;
-                zumbiY = data.zumbiY;
-
-            }
-
-            atualizarTela();
-
-        });
-
+      atualizarTela();
+    });
 }, 50);
 
-setInterval(function() {
+setInterval(function () {
+  if (teclas.w) {
+    enviarComando("W");
+  } else if (teclas.s) {
+    enviarComando("S");
+  }
 
-    if (teclas.w) {
-        enviarComando("W");
-    } else if (teclas.s) {
-        enviarComando("S");
-    }
-
-    if (teclas.a) {
-        enviarComando("A");
-    } else if (teclas.d) {
-        enviarComando("D");
-    }
-
+  if (teclas.a) {
+    enviarComando("A");
+  } else if (teclas.d) {
+    enviarComando("D");
+  }
 }, 50);
 
 // =============================
 // CRONÔMETRO
 // =============================
 
-// 3 minutos = 180 segundos
+let tempo = 0;
+let multiplicadorTempo = 1;
 
-let tempo = 180;
+const cronometro = document.getElementById("cronometro");
+const btnTempo5x = document.getElementById("btnTempo5x");
 
+// =============================
+// BOTÃO 5X
+// =============================
 
-const intervaloCronometro = setInterval(function() {
+btnTempo5x.addEventListener("click", function () {
+  if (multiplicadorTempo === 1) {
+    multiplicadorTempo = 5;
 
-    // Diminui 1 segundo
+    btnTempo5x.textContent = "5X ATIVO";
+    btnTempo5x.classList.add("ativo");
+  } else {
+    multiplicadorTempo = 1;
 
-    tempo--;
+    btnTempo5x.textContent = "5X TEMPO";
+    btnTempo5x.classList.remove("ativo");
+  }
+});
 
+// =============================
+// CRONÔMETRO
+// =============================
 
-    // Calcula minutos
+const intervaloCronometro = setInterval(function () {
+  // Aumenta o tempo
+  tempo += multiplicadorTempo;
 
-    const minutos = Math.floor(tempo / 60);
+  // Impede passar de 180
+  if (tempo > 180) {
+    tempo = 180;
+  }
 
+  // Calcula minutos
+  const minutos = Math.floor(tempo / 60);
 
-    // Calcula segundos
+  // Calcula segundos
+  const segundos = tempo % 60;
 
-    const segundos = tempo % 60;
+  // Formata para 00:00
+  const minutosFormatados = String(minutos).padStart(2, "0");
 
+  const segundosFormatados = String(segundos).padStart(2, "0");
 
-    // Formata para 00:00
+  // Mostra na tela
+  cronometro.textContent = minutosFormatados + ":" + segundosFormatados;
 
-    const minutosFormatados = String(minutos).padStart(2, "0");
+  // =============================
+  // 2 MINUTOS
+  // =============================
 
-    const segundosFormatados = String(segundos).padStart(2, "0");
+  if (tempo >= 120) {
+    cronometro.style.color = "yellow";
 
+    cronometro.style.border = "1px solid yellow";
 
-    // Mostra na tela
+    cronometro.style.transition = "0.50s";
 
-    cronometro.textContent =
-        minutosFormatados + ":" + segundosFormatados;
+    cronometro.style.boxShadow = "inset 0 3px 20px rgba(230, 226, 2, 0.747)";
+  }
 
+  // =============================
+  // 2:30
+  // =============================
 
-    // Quando faltar 1 minuto
+  if (tempo >= 150) {
+    cronometro.style.color = "red";
 
-    if (tempo <= 60) {
+    cronometro.style.border = "1px solid red";
 
-        cronometro.style.color = "yellow";
+    cronometro.style.transition = "0.50s";
 
-    }
+    cronometro.style.boxShadow = "inset 0 3px 20px rgba(230, 2, 2, 0.75)";
+  }
 
+  // =============================
+  // 3 MINUTOS
+  // =============================
 
-    // Quando faltar 30 segundos
+  if (tempo >= 180) {
+    clearInterval(intervaloCronometro);
 
-    if (tempo <= 30) {
+    cronometro.textContent = "TEMPO ESGOTADO!";
 
-        cronometro.style.color = "red";
+    cronometro.style.zIndex = "10001";
 
-    }
+    cronometro.style.display = "none";
 
+    telaFim.style.transition = "0.50s";
 
-    // Quando chegar em zero
+    telaFim.style.display = "flex";
 
-    if (tempo <= 0) {
+    cronometro.style.color = "red";
 
-        clearInterval(intervaloCronometro);
+    cronometro.style.transition = "0.50s";
 
-        cronometro.textContent = "00:00";
-
-        cronometro.style.color = "red";
-
-        console.log("TEMPO ESGOTADO!");
-
-    }
-
+    btnTempo5x.disabled = true;
+  }
 }, 1000);
 
+btnRecomecar.addEventListener("click", function () {
+  location.reload();
+});
 
 // =============================
 // POSIÇÃO INICIAL
